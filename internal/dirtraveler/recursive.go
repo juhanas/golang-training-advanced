@@ -23,26 +23,13 @@ func Recursive(dirName string) ([]string, error) {
 		)
 		return nil, err
 	}
-	slog.Info(
-		"debug1 in function: dircounter.Recursive",
-		slog.Int("dirItems.length", len(dirItems)),
-	)
 
 	filesFound := []string{}
 	for _, dirItem := range dirItems {
 		itemName := dirItem.Name()
 		path := dirName + "/" + itemName
-		slog.Info(
-			"debug2 in function: dircounter.Recursive",
-			slog.String("itemName", itemName),
-			slog.String("path", path),
-		)
 		if strings.Contains(itemName, ".") {
 			filesFound = append(filesFound, path)
-			slog.Info(
-				"debug3 in function: dircounter.Recursive",
-				slog.String("filesFound", strings.Join(filesFound, ",")),
-			)
 		} else {
 			newFiles, err := Recursive(path)
 			if err != nil {
