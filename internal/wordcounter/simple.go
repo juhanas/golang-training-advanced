@@ -17,17 +17,6 @@ func Simple(wordToFind, filePath string) (int, error) {
 	)
 
 	file, err := os.Open(filePath)
-	defer func() {
-		err := file.Close()
-		if err != nil {
-			slog.Error(
-				"panic in defer function: wordcounter.Simple",
-				slog.Any("file", file),
-				slog.String("error", err.Error()),
-			)
-			panic(err)
-		}
-	}()
 	if err != nil {
 		slog.Error(
 			"error from os.Open in function: wordcounter.Simple",
@@ -35,6 +24,9 @@ func Simple(wordToFind, filePath string) (int, error) {
 		)
 		return 0, err
 	}
+	defer func() {
+		file.Close()
+	}()
 
 	wordsFound := 0
 	scanner := bufio.NewScanner(file)
