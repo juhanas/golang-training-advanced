@@ -56,12 +56,15 @@ func FindWordHandler(c *gin.Context) {
 }
 
 func getWordsRecursively(wordToFind string) (int, error) {
-	filePaths, _ := dirtraveler.Recursive(dirPath)
-	slog.Debug(
-		"error from dirtraveler.Recursive in function: handlers.getWordsRecursively",
-		slog.String("wordToFind", wordToFind),
-		slog.String("filePaths", strings.Join(filePaths, ",")),
-	)
+	filePaths, err := dirtraveler.Recursive(dirPath)
+	if err != nil {
+		slog.Error(
+			"error from dirtraveler.Recursive in function: handlers.getWordsRecursive",
+			slog.String("wordToFind", wordToFind),
+			slog.String("filePaths", strings.Join(filePaths, ",")),
+		)
+		return 0, err
+	}
 
 	var wordsFound = 0
 	for _, filePath := range filePaths {
