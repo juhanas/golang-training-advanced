@@ -1,7 +1,9 @@
 package handlers
 
 import (
+	"log/slog"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/juhanas/golang-training-advanced/internal/dirtraveler"
@@ -18,8 +20,17 @@ var dirPath = "./data"
 func FindWordHandler(c *gin.Context) {
 	wordToFind := c.Query("word")
 
+	slog.Debug(
+		"incoming request: FindWordHandler",
+		slog.String("wordToFind", wordToFind),
+	)
+
 	if wordToFind == "" {
 		c.String(http.StatusBadRequest, "missing query param: word")
+		slog.Warn(
+			"validation error: FindWordHandler",
+			slog.String("wordToFind", wordToFind),
+		)
 		return
 	}
 
@@ -28,19 +39,39 @@ func FindWordHandler(c *gin.Context) {
 	wordsFound, err = getWordsRecursively(wordToFind)
 	if err != nil {
 		c.String(http.StatusInternalServerError, err.Error())
+		slog.Error(
+			"error: FindWordHandler",
+			slog.String("wordToFind", wordToFind),
+			slog.String("error", err.Error()),
+		)
 		return
 	}
 
+	slog.Info(
+		"successful request: FindWordHandler",
+		slog.String("wordToFind", wordToFind),
+		slog.Int("wordsFound", wordsFound),
+	)
 	c.String(http.StatusOK, "Found word '%s' %d times", wordToFind, wordsFound)
 }
 
 func getWordsRecursively(wordToFind string) (int, error) {
 	filePaths, _ := dirtraveler.Recursive(dirPath)
+	slog.Debug(
+		"error from dirtraveler.Recursive in function: handlers.getWordsRecursively",
+		slog.String("wordToFind", wordToFind),
+		slog.String("filePaths", strings.Join(filePaths, ",")),
+	)
 
 	var wordsFound = 0
 	for _, filePath := range filePaths {
 		words, err := wordcounter.Simple(wordToFind, filePath)
 		if err != nil {
+			slog.Error(
+				"error from wordcounter.Simple in function: handlers.getWordsRecursively",
+				slog.String("wordToFind", wordToFind),
+				slog.String("error", err.Error()),
+			)
 			return 0, err
 		}
 		wordsFound += words
