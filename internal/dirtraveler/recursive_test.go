@@ -4,6 +4,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	// Import package for its side-effects only (now init)
+	_ "github.com/juhanas/golang-training-advanced/pkg/testhelpers"
 )
 
 func TestRecursive(t *testing.T) {

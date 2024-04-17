@@ -9,6 +9,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
+
+	// Import package for its side-effects only (now init)
+	_ "github.com/juhanas/golang-training-advanced/pkg/testhelpers"
 )
 
 func TestFindWordHandler(t *testing.T) {
