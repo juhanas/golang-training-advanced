@@ -38,7 +38,7 @@ func Recursive(dirName string) ([]string, error) {
 			slog.String("path", path),
 		)
 		if strings.Contains(itemName, ".") {
-			filesFound := append(filesFound, path)
+			filesFound = append(filesFound, path)
 			slog.Info(
 				"debug3 in function: dircounter.Recursive",
 				slog.String("filesFound", strings.Join(filesFound, ",")),
