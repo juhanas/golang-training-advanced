@@ -1,6 +1,10 @@
 package secret
 
-import "fmt"
+import (
+	"fmt"
+
+	elisacommon "github.com/elisasre/go-common"
+)
 
 // Creates and returns a new StringSecret struct with the given name.
 // The struct does not yet contain an actual secret.
@@ -41,8 +45,13 @@ func (s *StringSecret) Encrypt(data string) (string, error) {
 		return "", fmt.Errorf("encrypted data already exists")
 	}
 
-	s.value = []byte(data)
-	return data, nil
+	encryptedValue, err := elisacommon.Encrypt([]byte(data), secretKey)
+	if err != nil {
+		return "", err
+	}
+
+	s.value = encryptedValue
+	return string(encryptedValue), nil
 }
 
 // Decrypts the data in the struct and returns it.
@@ -51,5 +60,10 @@ func (s *StringSecret) Decrypt() (string, error) {
 	if len(s.value) == 0 {
 		return "", fmt.Errorf("no secret found")
 	}
-	return string(s.value), nil
+
+	data, err := elisacommon.Decrypt(s.value, secretKey)
+	if err != nil {
+		return "", err
+	}
+	return string(data), nil
 }

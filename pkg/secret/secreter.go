@@ -1,6 +1,6 @@
 package secret
 
-// var secretKey = "secretKey"
+var secretKey = "secretKey"
 
 // Common interface that allows encrypting and decrypting data.
 // This is useful when we want to be able to call the same functions
