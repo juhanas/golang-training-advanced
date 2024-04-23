@@ -38,3 +38,7 @@ To run tests in another folder: `go test ./path/to/folder`
 To run a single test: `go test -run=[TestName] ./...`
 
 To run tests with extra info: `go test -v ./...`
+
+
+## Building
+This application can be built using Mage. Once installed, build the app simply by running `mage build`.
