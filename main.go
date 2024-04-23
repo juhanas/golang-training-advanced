@@ -54,4 +54,7 @@ func setupLogger() {
 
 func initRoutes(router *gin.Engine) {
 	router.GET("/find-word", handlers.FindWordHandler)
+	router.POST("/secrets", handlers.AddSecret)
+	router.GET("/secrets/:name", handlers.GetSecret)
+	router.GET("/secrets/count", handlers.CountSecrets)
 }

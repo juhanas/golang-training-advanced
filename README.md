@@ -20,6 +20,12 @@ Note: The base code is "broken" on purpose, and several tests fail. These will b
 
 - GET /find-word?word=cat
     - Returns the number of times the given word occurs in the book data stored on the server
+- POST /secrets
+    - Adds a new secret in the database and returns the encrypted value. Expects json-object with "name" and "value" strings.
+- GET /secrets/[secretName]
+    - Returns the decrypted value of the secret with the given name. Returns error if secret not found.
+- GET /secrets/count
+    - Returns the number of times all secrets have been read or created.
 
 ## Testing
 ### Unit tests
