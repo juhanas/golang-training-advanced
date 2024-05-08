@@ -19,9 +19,14 @@ func CountSecrets(c *gin.Context) {
 		"incoming request: CountSecrets",
 	)
 
+	// Locking the mutex for reading. This only blocks
+	// if there is a write operation at the same time.
+	mutex.RLock()
 	cd := CountData{
 		Reads:  counts["read"],
 		Writes: counts["created"],
 	}
+	mutex.RUnlock()
+
 	c.JSON(http.StatusOK, cd)
 }

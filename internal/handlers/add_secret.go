@@ -3,6 +3,7 @@ package handlers
 import (
 	"log/slog"
 	"net/http"
+	"sync"
 
 	"github.com/gin-gonic/gin"
 
@@ -26,6 +27,8 @@ var counts = map[string]int{
 	"created": 0,
 	"read":    0,
 }
+
+var mutex sync.RWMutex
 
 // Gin route handler for adding a secret to the memory-db.
 // The response (success or fail) will be written into the context.
@@ -83,7 +86,9 @@ func AddSecret(c *gin.Context) {
 	}
 
 	secrets[secretItem.GetName()] = &secretItem
+	mutex.Lock()
 	counts["created"] = counts["created"] + 1
+	mutex.Unlock()
 
 	c.String(http.StatusCreated, encryptedData)
 }

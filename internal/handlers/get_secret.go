@@ -38,7 +38,9 @@ func GetSecret(c *gin.Context) {
 		return
 	}
 
+	mutex.Lock()
 	counts["read"] = counts["read"] + 1
+	mutex.Unlock()
 
 	c.String(http.StatusOK, data)
 }
