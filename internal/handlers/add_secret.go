@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/juhanas/golang-training-advanced/pkg/secreter"
+	"github.com/juhanas/golang-training-advanced/pkg/secret"
 )
 
 // Internal struct to allow reading data from the post request
@@ -20,7 +20,7 @@ type secretDataStruct struct {
 // simply replace *secreter.Secret with some other type
 // that implements the secreter.Secreter interface and
 // everything else in this package would work the same!
-var secrets = map[string]*secreter.Secret{}
+var secrets = map[string]*secret.Secreter{}
 
 var counts = map[string]int{
 	"created": 0,
@@ -64,8 +64,15 @@ func AddSecret(c *gin.Context) {
 		return
 	}
 
-	secret := secreter.NewSecret(secretData.Name)
-	encryptedData, err := secret.Encrypt(secretData.Value)
+	// By defining the variable's type as secreter.Secreter,
+	// we can easily change the implementation of the secret
+	var secretItem secret.Secreter
+	// This line defines which implementation of the secreter.Secreter
+	// interface we want to use. In this case, it's the secreter.String
+	secretItem = secret.NewString(secretData.Name)
+	// Regardless of the implementation, the Encrypt function will always
+	// work the same way and this line does not need to be modified
+	encryptedData, err := secretItem.Encrypt(secretData.Value)
 	if err != nil {
 		c.String(http.StatusInternalServerError, "something went wrong")
 		slog.Error(
@@ -75,7 +82,7 @@ func AddSecret(c *gin.Context) {
 		return
 	}
 
-	secrets[secret.Name] = secret
+	secrets[secretItem.GetName()] = &secretItem
 	counts["created"] = counts["created"] + 1
 
 	c.String(http.StatusCreated, encryptedData)

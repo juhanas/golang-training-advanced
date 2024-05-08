@@ -10,12 +10,12 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/juhanas/golang-training-advanced/pkg/secreter"
+	"github.com/juhanas/golang-training-advanced/pkg/secret"
 )
 
 func TestAddSecret(t *testing.T) {
 	defer func() {
-		secrets = map[string]*secreter.Secret{}
+		secrets = map[string]*secret.Secreter{}
 		counts["created"] = 0
 	}()
 
@@ -45,7 +45,7 @@ func TestAddSecret(t *testing.T) {
 	if ok {
 		assert.NotSame(t, secretValue, val)
 		// Verify the data was encrypted correctly
-		data, err := secrets[secretName].Decrypt()
+		data, err := (*secrets[secretName]).Decrypt()
 		assert.Nil(t, err)
 		assert.Equal(t, secretValue, string(data))
 	}

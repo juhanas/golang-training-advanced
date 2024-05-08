@@ -28,7 +28,7 @@ func GetSecret(c *gin.Context) {
 		return
 	}
 
-	data, err := secret.Decrypt()
+	data, err := (*secret).Decrypt()
 	if err != nil {
 		c.String(http.StatusInternalServerError, "secret could not be obtained")
 		slog.Warn(

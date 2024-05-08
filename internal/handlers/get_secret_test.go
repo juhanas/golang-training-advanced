@@ -8,24 +8,30 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/juhanas/golang-training-advanced/pkg/secreter"
+	"github.com/juhanas/golang-training-advanced/pkg/secret"
 )
 
 func TestGetSecret(t *testing.T) {
 	defer func() {
-		secrets = map[string]*secreter.Secret{}
+		secrets = map[string]*secret.Secreter{}
 		counts["read"] = 0
 	}()
 
 	secretName := "testSecret"
 	secretValue := "abc"
-	secret := secreter.NewSecret(secretName)
-	_, err := secret.Encrypt(secretValue)
+	secretItem := secret.NewString(secretName)
+	_, err := secretItem.Encrypt(secretValue)
 	if err != nil {
 		panic(err)
 	}
 
-	secrets[secretName] = secret
+	// Note: The go static checker might complain about this line
+	// but by using this type casting we can make sure that we can
+	// use every implementation of the Secreter interface without
+	// having to change this part of the code.
+	var actualSecret secret.Secreter
+	actualSecret = secretItem // Type cast to the interface
+	secrets[secretName] = &actualSecret
 
 	gin.SetMode(gin.TestMode)
 	w := httptest.NewRecorder()
