@@ -29,3 +29,18 @@ func Build() error {
 
 	return buildhelpers.CopyDataFolder("./data", targetPath+"data")
 }
+
+// Run all tests
+func Test() error {
+	return sh.Run("go", "test", "./...")
+}
+
+// Run only integration tests
+func TestIntegration() error {
+	return sh.Run("go", "test", "-run", "Integration", "./...")
+}
+
+// Run only unit tests
+func TestUnit() error {
+	return sh.Run("go", "test", "-short", "./...")
+}

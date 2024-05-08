@@ -28,8 +28,8 @@ Note: The base code is "broken" on purpose, and several tests fail. These will b
     - Returns the number of times all secrets have been read or created.
 
 ## Testing
-### Unit tests
-To run all unit tests: `go test ./...`
+### All tests
+To run all tests: `go test ./...`
 
 To run tests in the current folder: `go test .`
 
@@ -39,6 +39,16 @@ To run a single test: `go test -run=[TestName] ./...`
 
 To run tests with extra info: `go test -v ./...`
 
+### Unit tests
+To only run unit tests: `go test -short ./...`
+
+### Integration tests
+To only run unit tests: `go test -run Integration ./...`
+
+### Using Mage
+Tests can also be run using Mage by using `mage -v [scriptName]` where script name is the desired level of tests, e.g. "testIntegration".
 
 ## Building
 This application can be built using Mage. Once installed, build the app simply by running `mage build`.
+
+To clean the build dir, the `mage clean` command can be used.
