@@ -21,7 +21,7 @@ func TestIntegrations(t *testing.T) {
 	callsToGet := 5000
 
 	defer func() {
-		secrets = map[string]*secret.Secreter{}
+		secrets = map[string]*secret.Secreter[string]{}
 		counts["read"] = 0
 		counts["created"] = 0
 	}()
@@ -34,7 +34,7 @@ func TestIntegrations(t *testing.T) {
 		panic(err)
 	}
 
-	var actualSecret secret.Secreter
+	var actualSecret secret.Secreter[string]
 	actualSecret = secretItem
 	secrets[secretName] = &actualSecret
 

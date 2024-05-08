@@ -13,7 +13,7 @@ import (
 
 func TestGetSecret(t *testing.T) {
 	defer func() {
-		secrets = map[string]*secret.Secreter{}
+		secrets = map[string]*secret.Secreter[string]{}
 		counts["read"] = 0
 	}()
 
@@ -29,7 +29,7 @@ func TestGetSecret(t *testing.T) {
 	// but by using this type casting we can make sure that we can
 	// use every implementation of the Secreter interface without
 	// having to change this part of the code.
-	var actualSecret secret.Secreter
+	var actualSecret secret.Secreter[string]
 	actualSecret = secretItem // Type cast to the interface
 	secrets[secretName] = &actualSecret
 

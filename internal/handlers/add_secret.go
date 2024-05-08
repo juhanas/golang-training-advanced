@@ -21,7 +21,7 @@ type secretDataStruct struct {
 // simply replace *secreter.Secret with some other type
 // that implements the secreter.Secreter interface and
 // everything else in this package would work the same!
-var secrets = map[string]*secret.Secreter{}
+var secrets = map[string]*secret.Secreter[string]{}
 
 var counts = map[string]int{
 	"created": 0,
@@ -69,7 +69,7 @@ func AddSecret(c *gin.Context) {
 
 	// By defining the variable's type as secreter.Secreter,
 	// we can easily change the implementation of the secret
-	var secretItem secret.Secreter
+	var secretItem secret.Secreter[string]
 	// This line defines which implementation of the secreter.Secreter
 	// interface we want to use. In this case, it's the secreter.String
 	secretItem = secret.NewString(secretData.Name)

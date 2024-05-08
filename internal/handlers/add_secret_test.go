@@ -15,7 +15,7 @@ import (
 
 func TestAddSecret(t *testing.T) {
 	defer func() {
-		secrets = map[string]*secret.Secreter{}
+		secrets = map[string]*secret.Secreter[string]{}
 		counts["created"] = 0
 	}()
 

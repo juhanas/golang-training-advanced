@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"log/slog"
 	"net/http"
 
@@ -42,5 +43,5 @@ func GetSecret(c *gin.Context) {
 	counts["read"] = counts["read"] + 1
 	mutex.Unlock()
 
-	c.String(http.StatusOK, data)
+	c.String(http.StatusOK, fmt.Sprint(data))
 }
