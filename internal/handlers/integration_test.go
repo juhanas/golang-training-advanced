@@ -13,6 +13,11 @@ import (
 )
 
 func TestIntegrations(t *testing.T) {
+	// Skip this test when using the -short flag
+	if testing.Short() {
+		t.Skip()
+	}
+
 	callsToGet := 5000
 
 	defer func() {
