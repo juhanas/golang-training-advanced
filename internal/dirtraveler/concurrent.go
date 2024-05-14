@@ -16,15 +16,16 @@ func Concurrent(dirName string, filesChan chan string, wg *sync.WaitGroup) error
 
 	for _, dirItem := range dirItems {
 		itemName := dirItem.Name()
-		// path := dirName + "/" + itemName
+		path := dirName + "/" + itemName
 		if strings.Contains(itemName, ".") {
 			if strings.Contains(itemName, ".txt") {
-				// TODO: Add a file to the channel
+				filesChan <- path
 			}
 		} else {
-			// TODO: Go through another full directory
+			wg.Add(1)
+			go Concurrent(path, filesChan, wg)
 		}
 	}
-	// TODO: Indicate that the operation is done
+	wg.Done()
 	return nil
 }

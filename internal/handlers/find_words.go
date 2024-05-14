@@ -4,10 +4,12 @@ import (
 	"log/slog"
 	"net/http"
 	"strings"
+	"sync"
 
 	"github.com/gin-gonic/gin"
 	"github.com/juhanas/golang-training-advanced/internal/dirtraveler"
 	"github.com/juhanas/golang-training-advanced/internal/wordcounter"
+	"github.com/juhanas/golang-training-advanced/pkg/helpers"
 )
 
 // Path in reference to where the program is run - now "main.go" in root
@@ -93,12 +95,35 @@ func getWordsRecursively(wordToFind string) (int, error) {
 }
 
 func getWordsConcurrently(wordToFind string) (int, error) {
-	// TODO: Get all file paths concurrently
+	wgDir := new(sync.WaitGroup)
+	wgWords := new(sync.WaitGroup)
+	filesChan := make(chan string)
+	countChan := make(chan int)
 
-	// TODO: Count words concurrently
+	wgDir.Add(1)
+	go dirtraveler.Concurrent(dirPath, filesChan, wgDir)
+	go helpers.CloseChan(filesChan, wgDir)
+
+	for {
+		filePath, more := <-filesChan
+		if more {
+			wgWords.Add(1)
+			go wordcounter.Concurrent(wordToFind, filePath, countChan, wgWords)
+		} else {
+			break
+		}
+	}
+	go helpers.CloseChan(countChan, wgWords)
 
 	wordsFound := 0
-	// TODO: Aggregate word counts
+	for {
+		count, more := <-countChan
+		if more {
+			wordsFound += count
+		} else {
+			break
+		}
+	}
 
 	return wordsFound, nil
 }

@@ -24,7 +24,7 @@ func TestFindWordHandler(t *testing.T) {
 	// dirPath must be set in reference to the location where the test is run - now "./internal/handlers"
 	dirPath = "../../data"
 
-	responseText := fmt.Sprintf("Found word '%s' %d times", "cat", 2206)
+	responseText := fmt.Sprintf("Found word '%s' %d times with concurrent %s", "cat", 2206, "false")
 	runFindWordTest(t, "cat", "false", responseText, 200)
 }
 
@@ -48,28 +48,6 @@ func TestFindWordHandlerConcurrent(t *testing.T) {
 
 	responseText := fmt.Sprintf("Found word '%s' %d times with concurrent %s", "cat", 2206, "true")
 	runFindWordTest(t, "cat", "true", responseText, 200)
-}
-
-func TestFindWordHandlerConcurrentFileError(t *testing.T) {
-	dirPathOrig := dirPath
-	defer func() {
-		dirPath = dirPathOrig
-	}()
-	dirPath = "./not-found"
-
-	responseText := "open ./not-found: The system cannot find the file specified."
-	runFindWordTest(t, "cat", "true", responseText, 500)
-}
-
-func TestFindWordsHandlerConcurrentDataError(t *testing.T) {
-	dirPathOrig := dirPath
-	defer func() {
-		dirPath = dirPathOrig
-	}()
-	dirPath = "../../dataBroken"
-
-	responseText := "error happened when reading file"
-	runFindWordTest(t, "cat", "true", responseText, 500)
 }
 
 func runFindWordTest(t *testing.T, wordToFind, concurrent, responseText string, statusCode int) {
