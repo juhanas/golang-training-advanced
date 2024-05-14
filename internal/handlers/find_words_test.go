@@ -25,7 +25,7 @@ func TestFindWordHandler(t *testing.T) {
 	dirPath = "../../data"
 
 	responseText := fmt.Sprintf("Found word '%s' %d times", "cat", 2206)
-	runFindWordTest(t, "cat", responseText, 200)
+	runFindWordTest(t, "cat", "false", responseText, 200)
 }
 
 func TestFindWordHandlerFileNotFound(t *testing.T) {
@@ -36,10 +36,28 @@ func TestFindWordHandlerFileNotFound(t *testing.T) {
 	dirPath = "./not-found"
 
 	responseText := "open ./not-found: The system cannot find the file specified."
-	runFindWordTest(t, "cat", responseText, 500)
+	runFindWordTest(t, "cat", "false", responseText, 500)
 }
 
-func runFindWordTest(t *testing.T, wordToFind, responseText string, statusCode int) {
+func TestFindWordHandlerConcurrent(t *testing.T) {
+	dirPath = "../../data"
+	responseText := fmt.Sprintf("Found word '%s' %d times with concurrent %s", "cat", 2206, "true")
+	runFindWordTest(t, "cat", "true", responseText, 200)
+}
+
+func TestFindWordHandlerConcurrentFileError(t *testing.T) {
+	dirPath = "./not-found"
+	responseText := "open ./not-found: The system cannot find the file specified."
+	runFindWordTest(t, "cat", "true", responseText, 500)
+}
+
+func TestFindWordsHandlerConcurrentDataError(t *testing.T) {
+	dirPath = "../../dataBroken"
+	responseText := "error happened when reading file"
+	runFindWordTest(t, "cat", "true", responseText, 500)
+}
+
+func runFindWordTest(t *testing.T, wordToFind, concurrent, responseText string, statusCode int) {
 	// Initialize a mock context with http recorder for gin
 	gin.SetMode(gin.TestMode)
 	w := httptest.NewRecorder()
@@ -51,6 +69,7 @@ func runFindWordTest(t *testing.T, wordToFind, responseText string, statusCode i
 
 	q := req.URL.Query()
 	q.Add("word", wordToFind)
+	q.Add("concurrent", concurrent)
 	req.URL.RawQuery = q.Encode()
 	ctx.Request = req
 

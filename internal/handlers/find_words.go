@@ -16,13 +16,16 @@ var dirPath = "./data"
 
 // Gin route handler for finding a specific word in the data.
 // The response (success or fail) will be written into the context.
-// Expects query param 'word' (string) in the request url.
+// Expects query param 'word' (string) and 'concurrent' (bool) in the request url.
 func FindWordHandler(c *gin.Context) {
 	wordToFind := c.Query("word")
+	concurrent := c.Query("concurrent")
+	useConcurrent := concurrent == "true"
 
 	slog.Debug(
 		"incoming request: FindWordHandler",
 		slog.String("wordToFind", wordToFind),
+		"concurrent", concurrent,
 	)
 
 	if wordToFind == "" {
@@ -36,12 +39,18 @@ func FindWordHandler(c *gin.Context) {
 
 	var wordsFound int
 	var err error
-	wordsFound, err = getWordsRecursively(wordToFind)
+	if useConcurrent {
+		wordsFound, err = getWordsConcurrently(wordToFind)
+	} else {
+		wordsFound, err = getWordsRecursively(wordToFind)
+	}
+
 	if err != nil {
 		c.String(http.StatusInternalServerError, err.Error())
 		slog.Error(
 			"error: FindWordHandler",
 			slog.String("wordToFind", wordToFind),
+			"concurrent", concurrent,
 			slog.String("error", err.Error()),
 		)
 		return
@@ -50,9 +59,10 @@ func FindWordHandler(c *gin.Context) {
 	slog.Info(
 		"successful request: FindWordHandler",
 		slog.String("wordToFind", wordToFind),
+		"concurrent", concurrent,
 		slog.Int("wordsFound", wordsFound),
 	)
-	c.String(http.StatusOK, "Found word '%s' %d times", wordToFind, wordsFound)
+	c.String(http.StatusOK, "Found word '%s' %d times with concurrent %t", wordToFind, wordsFound, useConcurrent)
 }
 
 func getWordsRecursively(wordToFind string) (int, error) {
@@ -79,5 +89,16 @@ func getWordsRecursively(wordToFind string) (int, error) {
 		}
 		wordsFound += words
 	}
+	return wordsFound, nil
+}
+
+func getWordsConcurrently(wordToFind string) (int, error) {
+	// TODO: Get all file paths concurrently
+
+	// TODO: Count words concurrently
+
+	wordsFound := 0
+	// TODO: Aggregate word counts
+
 	return wordsFound, nil
 }
