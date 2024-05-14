@@ -40,19 +40,34 @@ func TestFindWordHandlerFileNotFound(t *testing.T) {
 }
 
 func TestFindWordHandlerConcurrent(t *testing.T) {
+	dirPathOrig := dirPath
+	defer func() {
+		dirPath = dirPathOrig
+	}()
 	dirPath = "../../data"
+
 	responseText := fmt.Sprintf("Found word '%s' %d times with concurrent %s", "cat", 2206, "true")
 	runFindWordTest(t, "cat", "true", responseText, 200)
 }
 
 func TestFindWordHandlerConcurrentFileError(t *testing.T) {
+	dirPathOrig := dirPath
+	defer func() {
+		dirPath = dirPathOrig
+	}()
 	dirPath = "./not-found"
+
 	responseText := "open ./not-found: The system cannot find the file specified."
 	runFindWordTest(t, "cat", "true", responseText, 500)
 }
 
 func TestFindWordsHandlerConcurrentDataError(t *testing.T) {
+	dirPathOrig := dirPath
+	defer func() {
+		dirPath = dirPathOrig
+	}()
 	dirPath = "../../dataBroken"
+
 	responseText := "error happened when reading file"
 	runFindWordTest(t, "cat", "true", responseText, 500)
 }
