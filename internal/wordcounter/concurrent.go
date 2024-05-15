@@ -35,6 +35,22 @@ func Concurrent(wordToFind, filePath string, countChan chan int, wgCount *sync.W
 	return nil
 }
 
+// Counts the number of words in the file found in the path.
+// The counting is done in separate goroutines to increase performance with large datasets.
+func ConcurrentWithError(wordToFind, filePath string, countChan chan int) error {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	// TODO: Call getLines in a goroutine and detect errors
+
+	// TODO: Count words and handle errors
+
+	return nil
+}
+
 func getLines(file *os.File, lineChan chan string) error {
 	defer close(lineChan)
 	scanner := bufio.NewScanner(file)

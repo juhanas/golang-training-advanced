@@ -16,6 +16,8 @@ import (
 // Using global private variable to allow tests to change it
 var dirPath = "./data"
 
+var withErrors = true // Should concurrent functions detect errors
+
 // Gin route handler for finding a specific word in the data.
 // The response (success or fail) will be written into the context.
 // Expects query param 'word' (string) and 'concurrent' (bool) in the request url.
@@ -42,7 +44,11 @@ func FindWordHandler(c *gin.Context) {
 	var wordsFound int
 	var err error
 	if useConcurrent {
-		wordsFound, err = getWordsConcurrently(wordToFind)
+		if withErrors {
+			wordsFound, err = getWordsConcurrentlyWithError(wordToFind)
+		} else {
+			wordsFound, err = getWordsConcurrently(wordToFind)
+		}
 	} else {
 		wordsFound, err = getWordsRecursively(wordToFind)
 	}
@@ -124,6 +130,22 @@ func getWordsConcurrently(wordToFind string) (int, error) {
 			break
 		}
 	}
+
+	return wordsFound, nil
+}
+
+func getWordsConcurrentlyWithError(wordToFind string) (int, error) {
+	// TODO: Call dirtraveler.ConcurrentWithError
+
+	// TODO: Detect the error
+
+	// TODO: Call wordcounter.ConcurrentWithError & handle detected errors
+
+	// TODO: Detect the error
+
+	wordsFound := 0
+
+	// TODO: Aggregate word counts * handle errors
 
 	return wordsFound, nil
 }

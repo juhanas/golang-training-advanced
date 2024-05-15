@@ -50,6 +50,36 @@ func TestFindWordHandlerConcurrent(t *testing.T) {
 	runFindWordTest(t, "cat", "true", responseText, 200)
 }
 
+func TestFindWordHandlerConcurrentFileError(t *testing.T) {
+	if withErrors != true {
+		t.Skip("Skipping test because error handling is off")
+	}
+
+	dirPathOrig := dirPath
+	defer func() {
+		dirPath = dirPathOrig
+	}()
+	dirPath = "../../data2"
+
+	responseText := "open ../../data2: The system cannot find the file specified."
+	runFindWordTest(t, "cat", "true", responseText, 500)
+}
+
+func TestFindWordsHandlerConcurrentDataError(t *testing.T) {
+	if withErrors != true {
+		t.Skip("Skipping test because error handling is off")
+	}
+
+	dirPathOrig := dirPath
+	defer func() {
+		dirPath = dirPathOrig
+	}()
+	dirPath = "../../dataBroken"
+
+	responseText := "error happened when reading file"
+	runFindWordTest(t, "cat", "true", responseText, 500)
+}
+
 func runFindWordTest(t *testing.T, wordToFind, concurrent, responseText string, statusCode int) {
 	// Initialize a mock context with http recorder for gin
 	gin.SetMode(gin.TestMode)

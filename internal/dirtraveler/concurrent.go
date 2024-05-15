@@ -4,6 +4,8 @@ import (
 	"os"
 	"strings"
 	"sync"
+
+	"golang.org/x/sync/errgroup"
 )
 
 // Reads through a directory concurrently, by using goroutines and channels.
@@ -27,5 +29,27 @@ func Concurrent(dirName string, filesChan chan string, wg *sync.WaitGroup) error
 		}
 	}
 	wg.Done()
+	return nil
+}
+
+// Reads through a directory concurrently, by using goroutines and channels.
+// Also uses error groups to handle errors.
+func ConcurrentWithError(dirName string, filesChan chan string, eg *errgroup.Group) error {
+	dirItems, err := os.ReadDir(dirName)
+	if err != nil {
+		return err
+	}
+
+	for _, dirItem := range dirItems {
+		itemName := dirItem.Name()
+		path := dirName + "/" + itemName
+		if strings.Contains(itemName, ".") {
+			if strings.Contains(itemName, ".txt") {
+				filesChan <- path
+			}
+		} else {
+			// Call ConcurrentWithError concurrently
+		}
+	}
 	return nil
 }
