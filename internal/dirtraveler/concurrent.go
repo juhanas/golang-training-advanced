@@ -48,7 +48,9 @@ func ConcurrentWithError(dirName string, filesChan chan string, eg *errgroup.Gro
 				filesChan <- path
 			}
 		} else {
-			// Call ConcurrentWithError concurrently
+			eg.Go(func() error {
+				return ConcurrentWithError(path, filesChan, eg)
+			})
 		}
 	}
 	return nil

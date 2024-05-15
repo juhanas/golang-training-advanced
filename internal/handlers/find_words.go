@@ -10,6 +10,7 @@ import (
 	"github.com/juhanas/golang-training-advanced/internal/dirtraveler"
 	"github.com/juhanas/golang-training-advanced/internal/wordcounter"
 	"github.com/juhanas/golang-training-advanced/pkg/helpers"
+	"golang.org/x/sync/errgroup"
 )
 
 // Path in reference to where the program is run - now "main.go" in root
@@ -135,17 +136,67 @@ func getWordsConcurrently(wordToFind string) (int, error) {
 }
 
 func getWordsConcurrentlyWithError(wordToFind string) (int, error) {
-	// TODO: Call dirtraveler.ConcurrentWithError
+	egDir := new(errgroup.Group)
+	egWords := new(errgroup.Group)
+	filesChan := make(chan string)
+	countChan := make(chan int)
+	errChan := make(chan error)
 
-	// TODO: Detect the error
+	egDir.Go(func() error {
+		return dirtraveler.ConcurrentWithError(dirPath, filesChan, egDir)
+	})
+	go func() {
+		err := egDir.Wait()
+		close(filesChan)
+		if err != nil {
+			errChan <- err
+		}
+		close(errChan)
+	}()
 
-	// TODO: Call wordcounter.ConcurrentWithError & handle detected errors
-
-	// TODO: Detect the error
+	// Name the for loop. Name can be anything, but it must be unique.
+loop:
+	for {
+		select {
+		case err := <-errChan:
+			if err != nil {
+				close(countChan)
+				return 0, err
+			}
+			// Break out of the outer statement with name "loop"
+			break loop
+		case filePath := <-filesChan:
+			egWords.Go(func() error {
+				if filePath != "" {
+					return wordcounter.ConcurrentWithError(wordToFind, filePath, countChan)
+				}
+				return nil
+			})
+		}
+	}
+	errChan = make(chan error)
+	go func() {
+		err := egWords.Wait()
+		close(countChan)
+		if err != nil {
+			errChan <- err
+		}
+		close(errChan)
+	}()
 
 	wordsFound := 0
-
-	// TODO: Aggregate word counts * handle errors
+loop2:
+	for {
+		select {
+		case err := <-errChan:
+			if err != nil {
+				return 0, err
+			}
+			break loop2
+		case count := <-countChan:
+			wordsFound += count
+		}
+	}
 
 	return wordsFound, nil
 }

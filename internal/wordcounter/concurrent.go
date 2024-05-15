@@ -6,6 +6,8 @@ import (
 	"os"
 	"strings"
 	"sync"
+
+	"golang.org/x/sync/errgroup"
 )
 
 // Counts the number of words in the file found in the path.
@@ -38,17 +40,36 @@ func Concurrent(wordToFind, filePath string, countChan chan int, wgCount *sync.W
 // Counts the number of words in the file found in the path.
 // The counting is done in separate goroutines to increase performance with large datasets.
 func ConcurrentWithError(wordToFind, filePath string, countChan chan int) error {
+	eg := new(errgroup.Group)
+	errChan := make(chan error)
 	file, err := os.Open(filePath)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
 
-	// TODO: Call getLines in a goroutine and detect errors
+	lineChan := make(chan string)
 
-	// TODO: Count words and handle errors
-
-	return nil
+	eg.Go(func() error {
+		return getLines(file, lineChan)
+	})
+	go func() {
+		err := eg.Wait()
+		if err != nil {
+			errChan <- err
+		}
+		close(errChan)
+	}()
+	for {
+		select {
+		case err := <-errChan:
+			return err // Returns nil or error if it happened
+		case line := <-lineChan:
+			if count := strings.Count(line, wordToFind); count > 0 { // Without this if, execution takes a lot of time
+				countChan <- count
+			}
+		}
+	}
 }
 
 func getLines(file *os.File, lineChan chan string) error {
