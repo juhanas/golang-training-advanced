@@ -21,6 +21,7 @@ Note: The base code is "broken" on purpose, and several tests fail. These will b
 - GET /find-word?word=cat&concurrent=true
     - Returns the number of times the given word occurs in the book data stored on the server
     - When concurrent=true, uses the concurrent implementation, otherwise uses recursive implementation
+    - Note: Concurrent error handling can be switched on/off in the handlers/find_words.go file
 - POST /secrets
     - Adds a new secret in the database and returns the encrypted value. Expects json-object with "name" and "value" strings.
 - GET /secrets/[secretName]
