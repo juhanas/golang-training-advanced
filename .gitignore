@@ -1,1 +1,4 @@
 bin
+/internal/handlers/handlers.test.exe
+/internal/handlers/cpu.prof
+/internal/handlers/mem.prof

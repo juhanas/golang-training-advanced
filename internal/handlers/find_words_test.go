@@ -101,3 +101,25 @@ func runFindWordTest(t *testing.T, wordToFind, concurrent, responseText string, 
 	assert.Equal(t, statusCode, w.Code)
 	assert.Equal(t, responseText, w.Body.String())
 }
+
+func BenchmarkGetWordsRecursively(b *testing.B) {
+	dirPathOrig := dirPath
+	defer func() {
+		dirPath = dirPathOrig
+	}()
+	dirPath = "../../data"
+	for i := 0; i < b.N; i++ {
+		getWordsRecursively("cat")
+	}
+}
+
+func BenchmarkGetWordsConcurrently(b *testing.B) {
+	dirPathOrig := dirPath
+	defer func() {
+		dirPath = dirPathOrig
+	}()
+	dirPath = "../../data"
+	for i := 0; i < b.N; i++ {
+		getWordsConcurrently("cat")
+	}
+}

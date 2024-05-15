@@ -47,6 +47,12 @@ To only run unit tests: `go test -short ./...`
 ### Integration tests
 To only run unit tests: `go test -run Integration ./...`
 
+### Benchmark tests
+To run benchmark tests: `go test -bench='Benchmark' -run=^$ ./...`
+
+To run benchmark tests and record profiling data (must be run inside a package folder with benchmark tests):
+`go test -bench='BenchmarkGetWordsRecursively' -cpuprofile='cpu.prof' -memprofile='mem.prof' -run=^$ .`
+
 ### Using Mage
 Tests can also be run using Mage by using `mage -v [scriptName]` where script name is the desired level of tests, e.g. "testIntegration".
 
@@ -54,3 +60,8 @@ Tests can also be run using Mage by using `mage -v [scriptName]` where script na
 This application can be built using Mage. Once installed, build the app simply by running `mage build`.
 
 To clean the build dir, the `mage clean` command can be used.
+
+## Profiling
+The code can be profiled with the pprof tool. After running benchmarks and recording the profiling data (see Test section), use the following commands in the folder where the files are located:
+- `go tool pprof cpu.prof`
+- `go tool pprof mem.prof`
